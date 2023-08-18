@@ -11,8 +11,8 @@ def main():
     while conn:
         data = str(conn.recv(1024))
 
-        # if data.lower() == '+PING\n\r'.lower():
-        conn.send('+PONG\n\r'.encode())
+        if "ping" in data.lower():
+            conn.send("$4\r\nPONG\r\n".encode())
     
 if __name__ == "__main__":
     main()
