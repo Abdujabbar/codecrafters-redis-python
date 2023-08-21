@@ -1,7 +1,6 @@
 # Uncomment this to pass the first stage
 import socket
 import threading
-import concurrent.futures
 
 
 def execute_process(server_socket):
@@ -9,12 +8,21 @@ def execute_process(server_socket):
     
     while conn:
         data = conn.recv(1024).decode()
-                
-        if not data:
+        partials = list(filter(None, data.split("\r\n")))
+        
+        if not partials:
             return
         
-        if "ping" in data.lower():
+        _, _, command, *args = partials
+        command = command.lower()
+        
+        if command == 'ping':
             conn.send("$4\r\nPONG\r\n".encode())
+        elif command == 'echo':
+            partials.append('')
+            conn.send('\r\n'.join(partials[3:]).encode())
+        else:
+            raise Exception('Not Implemented')
     
     
 def main():
