@@ -6,14 +6,15 @@ import concurrent.futures
 
 def execute_process(server_socket):
     conn, address = server_socket.accept()
-    print(f"{conn=}, {address=}")
-    data = conn.recv(1024).decode()
-            
-    if not data:
-        return
     
-    if "ping" in data.lower():
-        conn.send("$4\r\nPONG\r\n".encode())
+    while conn:
+        data = conn.recv(1024).decode()
+                
+        if not data:
+            return
+        
+        if "ping" in data.lower():
+            conn.send("$4\r\nPONG\r\n".encode())
     
     
 def main():
