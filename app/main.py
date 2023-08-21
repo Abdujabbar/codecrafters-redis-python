@@ -9,7 +9,7 @@ def main():
     conn, address = server_socket.accept()
 
     while conn:
-        data = str(conn.recv(1024))
+        data = conn.recv(1024).decode()
 
         if "ping" in data.lower():
             conn.send("$4\r\nPONG\r\n".encode())
