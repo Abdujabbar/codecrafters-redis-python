@@ -35,7 +35,7 @@ def execute_process(server_socket, storage):
             partials = partials[3:]
             expire = 10 ** 30
             if len(partials) > 4:
-                expire = int(partials[-1])
+                expire = int(partials[-1]) / 1000
             key = partials[1]
             value = partials[3]
             storage[key] = (value, expire, time.time())
