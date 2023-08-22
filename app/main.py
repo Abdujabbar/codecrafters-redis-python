@@ -1,6 +1,7 @@
 # Uncomment this to pass the first stage
 import socket
 import threading
+import time
 
 
 class StorageSet(dict):
@@ -32,15 +33,24 @@ def execute_process(server_socket, storage):
             conn.send('\r\n'.join(partials[3:]).encode())
         elif command == 'set':
             partials = partials[3:]
+            expire = 10 ** 30
+            if len(partials) > 4:
+                expire = int(partials[-1])
             key = partials[1]
-            value = partials[-1]
-            storage[key] = value
+            value = partials[3]
+            storage[key] = (value, expire, time.time())
             conn.send("$2\r\nOK\r\n".encode())
         elif command == 'get':
             partials = partials[3:]
             key = partials[-1]
             if key in storage:
-                conn.send(f'${len(storage[key])}\r\n{storage[key]}\r\n'.encode())
+                value, expire, prev_time = storage.get(key)
+                curr_time = time.time()
+
+                if curr_time - prev_time > expire:
+                    conn.send(f"$-1\r\n".encode())
+                
+                conn.send(f'${len(value)}\r\n{value}\r\n'.encode())
             else:
                 conn.send(f"$-1\r\n".encode())
         else:
