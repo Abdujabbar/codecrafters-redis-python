@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "codecrafters-redis-python"
+version = "0.1.0"
+description = ""
+authors = ["Abdujabbar MIRKHALIKOV <abdujabbar.mirkhalikov@prestataire.sewan.fr>"]
+readme = "README.md"
+packages = [{include = "codecrafters_redis_python"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^2.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.1.0"
+black = "^23.9.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
