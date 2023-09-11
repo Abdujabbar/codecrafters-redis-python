@@ -6,6 +6,7 @@ from codecrafters_redis_python.commands import (
     CommandSet,
     CommandGet,
 )
+from codecrafters_redis_python.constants import LINE_BREAK
 
 
 class StorageSet(dict):
@@ -43,7 +44,7 @@ class RedisServer:
         conn, _ = server_socket.accept()
         while conn:
             data = conn.recv(1024).decode()
-            partials = list(filter(None, data.split("\r\n")))
+            partials = list(filter(None, data.split(LINE_BREAK)))
 
             if not partials:
                 return
