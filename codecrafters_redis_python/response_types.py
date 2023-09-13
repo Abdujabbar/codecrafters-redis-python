@@ -17,7 +17,7 @@ class RespSimpleString(RespType):
 
     def encode(self):
         content = f"${len(self.content)}{LINE_BREAK}{self.content}{LINE_BREAK}"
-        return (content.encode())
+        return content.encode()
 
 
 @dataclass

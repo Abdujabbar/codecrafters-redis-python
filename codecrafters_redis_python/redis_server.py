@@ -7,6 +7,7 @@ from codecrafters_redis_python.commands import (
     CommandGet,
 )
 from codecrafters_redis_python.constants import LINE_BREAK
+from codecrafters_redis_python.factories import CommandsFactory
 
 
 class StorageSet(dict):
@@ -20,24 +21,20 @@ class StorageSet(dict):
 
 
 class RedisServer:
-    OPERATION_COMMANDS = {
-        "ping": CommandPingPong,
-        "echo": CommandEcho,
-        "set": CommandSet,
-        "get": CommandGet,
-    }
-
     def __init__(self, host, port, storage) -> None:
         self.host = host
         self.port = port
         self.storage = storage
+        self.command_factory = CommandsFactory()
+        self.command_factory.register_command("ping", CommandPingPong)
+        self.command_factory.register_command("echo", CommandEcho)
+        self.command_factory.register_command("set", CommandSet)
+        self.command_factory.register_command("get", CommandGet)
 
     def run(self):
-        server_socket = socket.create_server((self.host, self.port),
-                                             reuse_port=True)
+        server_socket = socket.create_server((self.host, self.port), reuse_port=True)
         for _ in range(20):
-            x = threading.Thread(target=self.execute_process,
-                                 args=(server_socket,))
+            x = threading.Thread(target=self.execute_process, args=(server_socket,))
             x.start()
 
     def execute_process(self, server_socket):
@@ -50,10 +47,15 @@ class RedisServer:
                 return
             current_command = partials[2]
             current_arguments = partials[4::2]
-
-            if current_command in self.OPERATION_COMMANDS:
-                self.OPERATION_COMMANDS[current_command](
-                    self, conn, current_arguments
-                ).run()
-            else:
+            try:
+                command = self.command_factory.create(
+                    current_command,
+                    **{
+                        "server": self,
+                        "connection": conn,
+                        "arguments": current_arguments,
+                    }
+                )
+                command.run()
+            except Exception:
                 raise Exception("Not Implemented")
